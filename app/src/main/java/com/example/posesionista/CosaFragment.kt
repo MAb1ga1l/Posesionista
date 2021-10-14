@@ -8,7 +8,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import java.lang.Exception
 
 class CosaFragment : Fragment() {
 
@@ -39,7 +41,12 @@ class CosaFragment : Fragment() {
                         if (s.isEmpty()){
                             cosa.valorPesos = 0
                         }else{
-                            cosa.valorPesos = s.toString().toInt()
+                            try {
+                                cosa.valorPesos = s.toString().toInt()
+                            }catch (e:Exception){
+                                Toast.makeText(context, "número muy grande", Toast.LENGTH_SHORT).show()
+                                cosa.valorPesos = 0
+                            }
                         }
                     }
                 }

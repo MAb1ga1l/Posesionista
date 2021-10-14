@@ -41,7 +41,7 @@
         android:ems="10"
         android:hint="@string/labelPrecio"
         android:importantForAutofill="no"
-        android:inputType="textPersonName"
+        android:inputType="number"
         android:minHeight="48dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/campoNombreCosa"
