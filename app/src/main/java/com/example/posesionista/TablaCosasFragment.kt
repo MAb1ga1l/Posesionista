@@ -79,6 +79,7 @@ class TablaCosasFragment : Fragment() {
         //itemView es para buscar los elementos en la vista que se recibe
         val nombreTextView : TextView = itemView.findViewById(R.id.label_nombreCosa)
         val precioTextView : TextView = itemView.findViewById(R.id.label_precioCosa)
+        val numSerieTextView : TextView = itemView.findViewById(R.id.label_numSerie)
         private lateinit var cosa:Cosa
 
         @SuppressLint("SetTextI18n")
@@ -86,6 +87,7 @@ class TablaCosasFragment : Fragment() {
             this.cosa = cosa
             nombreTextView.text =cosa.nombreDeCosa
             precioTextView.text = "$" + cosa.valorPesos
+            numSerieTextView.text = cosa.numSerie
         }
 
         override fun onClick(v: View?) {
