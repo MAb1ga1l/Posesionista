@@ -2,6 +2,7 @@ package com.example.posesionista
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Color.argb
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -52,9 +53,9 @@ class TablaCosasFragment : Fragment() {
     }
 
     companion object{
-        fun nuevaInstancia() : TablaCosasFragment{
+       /* fun nuevaInstancia() : TablaCosasFragment{
             return TablaCosasFragment()
-        }
+        }*/
     }
 
     override fun onCreateView(
@@ -112,6 +113,7 @@ class TablaCosasFragment : Fragment() {
             //Vamos a poblar
             val cosa = inventario[position]
             holder.binding(cosa)
+            holder.itemView.setBackgroundColor(determinarColor(cosa.valorPesos))
         }
 
         //Cantidad de items en la lista
@@ -120,4 +122,28 @@ class TablaCosasFragment : Fragment() {
         }
 
     }
+
+    //función para determinar el color
+    private fun determinarColor(valorPesos: Int): Int {
+        var min = 0
+        var max = 99
+        var r = 0
+        var a = 255
+        var flag = true
+        for (i in 0..10) {
+            if (flag) {
+                //verificar si esta en el rango min - max
+                if ( valorPesos <= max) {
+                    flag = false
+                } else {
+                    min += 100
+                    max += 100
+                    r += 25
+                    a -= 25
+                }
+            }
+        }
+        return argb(a,r, 0, 255)
+    }
+
 }

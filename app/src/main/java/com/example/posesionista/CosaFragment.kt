@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import java.util.*
 
 class CosaFragment : Fragment() {
 
@@ -71,7 +70,7 @@ class CosaFragment : Fragment() {
         campoFecha = vista.findViewById(R.id.campoFecha) as TextView
         campoNombre.setText(cosa.nombreDeCosa)
         campoPrecio.setText(cosa.valorPesos.toString())
-        campoSerie.setText(cosa.numSerie.toString())
+        campoSerie.setText(cosa.numSerie)
         campoFecha.text = cosa.fechaCreacion.toString()
 
         return vista
