@@ -3,6 +3,7 @@ package com.example.posesionista
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +12,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import java.lang.Exception
-import kotlin.math.cos
+import java.util.*
 
 class CosaFragment : Fragment() {
 
@@ -86,9 +87,16 @@ class CosaFragment : Fragment() {
         campoNombre.setText(cosa.nombreDeCosa)
         campoPrecio.setText(cosa.valorPesos.toString())
         campoSerie.setText(cosa.numSerie)
-        campoFecha.text = cosa.fechaCreacion.toString()
+        campoFecha.text = ajusteFecha(cosa.fechaCreacion)
 
         return vista
+    }
+
+    private fun ajusteFecha(fecha : Date) : String {
+        val day = DateFormat.format("dd", fecha) as String
+        val mes = DateFormat.format("MM", fecha) as String
+        val anio = DateFormat.format("yyyy", fecha) as String
+        return day.plus(" / ").plus(mes).plus(" / ").plus(anio)
     }
 
     companion object {
