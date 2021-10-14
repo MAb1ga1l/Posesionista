@@ -11,6 +11,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import java.lang.Exception
+import kotlin.math.cos
 
 class CosaFragment : Fragment() {
 
@@ -35,6 +36,13 @@ class CosaFragment : Fragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if(s.hashCode() == campoNombre.text.hashCode()){
                     cosa.nombreDeCosa = s.toString()
+                    if (s!=null){
+                        if (s.isEmpty()){
+                            Toast.makeText(context, "Dejaste el nombre en blanco", Toast.LENGTH_SHORT).show()
+                            cosa.nombreDeCosa = "Artículo sin nombrar"
+
+                        }
+                    }
                 }
                 if(s.hashCode() == campoPrecio.text.hashCode()){
                     if (s!=null){
