@@ -4,4 +4,5 @@
     <string name="labelPrecio">Precio</string>
     <string name="labelSerie">No. Serie</string>
     <string name="lanelFecha">Fecha</string>
+    <string name="todo">TODO</string>
 </resources>

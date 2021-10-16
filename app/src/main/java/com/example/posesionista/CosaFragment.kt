@@ -1,5 +1,6 @@
 package com.example.posesionista
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -7,11 +8,10 @@ import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.fragment.app.Fragment
 import java.lang.Exception
+import java.text.SimpleDateFormat
 import java.util.*
 
 class CosaFragment : Fragment() {
@@ -21,6 +21,7 @@ class CosaFragment : Fragment() {
     private lateinit var campoPrecio : EditText
     private lateinit var campoSerie : EditText
     private lateinit var campoFecha : TextView
+    private lateinit var botonCalendario : ImageButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,7 +80,7 @@ class CosaFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         //Para infar la vista
-        val vista = inflater.inflate(R.layout.cosa_fragment,container,false)
+        val vista = inflater.inflate(R.layout.cosa_fragment, container, false)
         campoNombre = vista.findViewById(R.id.campoNombreCosa) as EditText
         campoPrecio = vista.findViewById(R.id.campoPrecio) as EditText
         campoSerie = vista.findViewById(R.id.campoSerie) as EditText
@@ -88,8 +89,30 @@ class CosaFragment : Fragment() {
         campoPrecio.setText(cosa.valorPesos.toString())
         campoSerie.setText(cosa.numSerie)
         campoFecha.text = ajusteFecha(cosa.fechaCreacion)
+        botonCalendario = vista.findViewById(R.id.botonCalendario) as ImageButton
+        botonCalendario.setOnClickListener { showDataPicker() }
 
         return vista
+    }
+
+    private fun showDataPicker() {
+        val datePicker = DatePickerFragment { dia, mes, anio -> onDateSlected(dia, mes, anio) }
+        datePicker.show(childFragmentManager,"datePicker")
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    fun onDateSlected(dia:Int, mes:Int, anio: Int){
+        val mesDelAnio = mes+1
+        val fecha : String= anio.toString().plus("-").plus(mesDelAnio).plus("-").plus(dia)
+        val fechaactual = Date()
+        val fechaValida = validarFecha(fechaactual,dia,mesDelAnio, anio)
+        if (!fechaValida){
+            Toast.makeText(context, "Fecha no valida", Toast.LENGTH_SHORT).show()
+        }else{
+            campoFecha.text = dia.toString().plus(" / ").plus(mesDelAnio).plus(" / ").plus(anio)
+            val format = SimpleDateFormat("yyyy-MM-dd")
+            cosa.fechaCreacion = format.parse(fecha)!!
+        }
     }
 
     private fun ajusteFecha(fecha : Date) : String {
@@ -97,6 +120,29 @@ class CosaFragment : Fragment() {
         val mes = DateFormat.format("MM", fecha) as String
         val anio = DateFormat.format("yyyy", fecha) as String
         return day.plus(" / ").plus(mes).plus(" / ").plus(anio)
+    }
+
+    private fun validarFecha(fecha : Date, dia:Int, mes:Int, anio: Int) : Boolean {
+        val dayActual = DateFormat.format("dd", fecha) as String
+        val mesActual = DateFormat.format("MM", fecha) as String
+        val anioActual = DateFormat.format("yyyy", fecha) as String
+        //Algoritmo para validar fecha
+        if ((anio > anioActual.toInt())||(anio < 1980)){
+            return false
+        }
+        if (anioActual.toInt() == anio ){
+            if (mes > mesActual.toInt()){
+                return false
+            }
+        }
+        if (anioActual.toInt() == anio ){
+            if (mes == mesActual.toInt()){
+                if (dia > dayActual.toInt()){
+                    return false
+                }
+            }
+        }
+        return true
     }
 
     companion object {
