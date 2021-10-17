@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
@@ -36,12 +37,28 @@ class TablaCosasFragment : Fragment() {
         callbackinterfaz = null
     }
 
-    private fun actualizaUI(){
+    private fun actualizaUI(context: Context){
         //Liga al inventario
         val inventario = tablaCosasViewModel.inventario
         adaptador = CosaAdapter(inventario)
+        val swipeGesture = object : SwipeGesture(context) {
+            @SuppressLint("NotifyDataSetChanged")
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                when(direction){
+                    ItemTouchHelper.LEFT -> {
+                        tablaCosasViewModel.eliminarCosa(viewHolder.absoluteAdapterPosition)
+                        adaptador!!.notifyDataSetChanged()
+                    }
+                }
+            }
+        }
+
+        val touchHelper = ItemTouchHelper(swipeGesture)
+        touchHelper.attachToRecyclerView(cosaRecyclerView)
+
         cosaRecyclerView.adapter = adaptador
     }
+
 
     private val tablaCosasViewModel : TablaCosasViewModel by lazy {
         ViewModelProvider(this).get(TablaCosasViewModel::class.java)
@@ -68,7 +85,7 @@ class TablaCosasFragment : Fragment() {
         cosaRecyclerView = vista.findViewById(R.id.cosa_recycler_view) as RecyclerView
         //indicamos el layout manager (para definir como se acomodan las cosas)
         cosaRecyclerView.layoutManager = LinearLayoutManager(context)
-        actualizaUI()
+        actualizaUI(requireContext().applicationContext)
         return vista
     }
 
@@ -147,5 +164,7 @@ class TablaCosasFragment : Fragment() {
         }
         return argb(a,r, 0, 255)
     }
+
+
 
 }

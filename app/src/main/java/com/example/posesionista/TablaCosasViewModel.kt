@@ -19,4 +19,10 @@ class TablaCosasViewModel : ViewModel() {
             inventario += cosa
         }
     }
+
+    //Función para elimiar una cosa
+    fun eliminarCosa(posicion : Int){
+        inventario.removeAt(posicion)
+    }
+
 }
