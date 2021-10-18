@@ -5,4 +5,7 @@
     <string name="labelSerie">No. Serie</string>
     <string name="lanelFecha">Fecha</string>
     <string name="todo">TODO</string>
+    <string name="cancel">Cancelar</string>
+    <string name="Ok">¿Seguro que quires eliminar este artículo?</string>
+    <string name="fire">OK</string>
 </resources>

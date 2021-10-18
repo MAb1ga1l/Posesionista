@@ -42,12 +42,12 @@ class TablaCosasFragment : Fragment() {
         val inventario = tablaCosasViewModel.inventario
         adaptador = CosaAdapter(inventario)
         val swipeGesture = object : SwipeGesture(context) {
-            @SuppressLint("NotifyDataSetChanged")
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 when(direction){
                     ItemTouchHelper.LEFT -> {
-                        tablaCosasViewModel.eliminarCosa(viewHolder.absoluteAdapterPosition)
-                        adaptador!!.notifyDataSetChanged()
+                        val dialogoFragment = ConfirmaDialogoFragment{flag ->  showDialogFragment(flag,viewHolder)}
+                        dialogoFragment.show(childFragmentManager, dialogoFragment.tag)
+
                     }
                 }
             }
@@ -59,6 +59,13 @@ class TablaCosasFragment : Fragment() {
         cosaRecyclerView.adapter = adaptador
     }
 
+    @SuppressLint("NotifyDataSetChanged")
+    private fun showDialogFragment(flag : Boolean, viewHolder : RecyclerView.ViewHolder) {
+        if(flag){
+            tablaCosasViewModel.eliminarCosa(viewHolder.absoluteAdapterPosition)
+        }
+        adaptador!!.notifyDataSetChanged()
+    }
 
     private val tablaCosasViewModel : TablaCosasViewModel by lazy {
         ViewModelProvider(this).get(TablaCosasViewModel::class.java)
