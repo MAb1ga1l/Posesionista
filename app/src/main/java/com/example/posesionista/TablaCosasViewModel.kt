@@ -25,4 +25,7 @@ class TablaCosasViewModel : ViewModel() {
         inventario.removeAt(posicion)
     }
 
+    //Función para reacomodar el inventario
+
+
 }

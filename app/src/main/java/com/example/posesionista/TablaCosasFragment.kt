@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import java.util.*
 
 private const val TAG = "TablaCosasFragment"
 class TablaCosasFragment : Fragment() {
@@ -42,6 +43,14 @@ class TablaCosasFragment : Fragment() {
         val inventario = tablaCosasViewModel.inventario
         adaptador = CosaAdapter(inventario)
         val swipeGesture = object : SwipeGesture(context) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return false
+            }
+
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 when(direction){
                     ItemTouchHelper.LEFT -> {
@@ -52,6 +61,8 @@ class TablaCosasFragment : Fragment() {
                 }
             }
         }
+
+
 
         val touchHelper = ItemTouchHelper(swipeGesture)
         touchHelper.attachToRecyclerView(cosaRecyclerView)
@@ -66,6 +77,8 @@ class TablaCosasFragment : Fragment() {
         }
         adaptador!!.notifyDataSetChanged()
     }
+
+
 
     private val tablaCosasViewModel : TablaCosasViewModel by lazy {
         ViewModelProvider(this).get(TablaCosasViewModel::class.java)
@@ -93,6 +106,9 @@ class TablaCosasFragment : Fragment() {
         //indicamos el layout manager (para definir como se acomodan las cosas)
         cosaRecyclerView.layoutManager = LinearLayoutManager(context)
         actualizaUI(requireContext().applicationContext)
+        val dragManageAdapter = DragManageAdapter(adaptador,context,ItemTouchHelper.UP or ItemTouchHelper.DOWN,ItemTouchHelper.LEFT)
+        val helper = ItemTouchHelper(dragManageAdapter)
+        helper.attachToRecyclerView(cosaRecyclerView)
         return vista
     }
 
@@ -147,6 +163,55 @@ class TablaCosasFragment : Fragment() {
             return inventario.size
         }
 
+        //Ordenar arreglo de nuevo después del drag
+        fun swapItems(fromPosition: Int, toPosition: Int) {
+            val nombreDeCosaAyuda : String = inventario[fromPosition].nombreDeCosa
+            val valorEnPesosAyuda : Int = inventario[fromPosition].valorPesos
+            val fechaDeCreacionAyuda : Date = inventario[fromPosition].fechaCreacion//El toString() puede que no sirva
+            val numeroDeSerieAyuda : String = inventario[fromPosition].numSerie
+
+
+            if (fromPosition < toPosition) {
+                for (i in fromPosition until toPosition) {//Antes eb vez del until era ..
+                    inventario[i].nombreDeCosa = inventario[i+1].nombreDeCosa
+                    inventario[i].valorPesos = inventario[i+1].valorPesos
+                    inventario[i].numSerie = inventario[i+1].numSerie
+                    inventario[i].fechaCreacion = inventario[i+1].fechaCreacion
+                    //inventario.set(i, inventario.set(i+1, inventario.get(i)));
+                }
+            } else {
+                for (i in fromPosition..toPosition + 1) {
+                    inventario[i].nombreDeCosa = inventario[i-1].nombreDeCosa
+                    inventario[i].valorPesos = inventario[i-1].valorPesos
+                    inventario[i].numSerie = inventario[i-1].numSerie
+                    inventario[i].fechaCreacion = inventario[i-1].fechaCreacion
+                    //inventario.set(i, inventario.set(i-1, inventario.get(i)));
+                }
+            }
+
+            inventario[toPosition].nombreDeCosa = nombreDeCosaAyuda
+            inventario[toPosition].valorPesos = valorEnPesosAyuda
+            inventario[toPosition].fechaCreacion = fechaDeCreacionAyuda
+            inventario[toPosition].numSerie = numeroDeSerieAyuda
+        }
+
+    }
+
+    @Suppress("UNUSED_PARAMETER")
+    private inner class DragManageAdapter(adapter: CosaAdapter?, context: Context?, dragDirs: Int, swipeDirs: Int) : ItemTouchHelper.SimpleCallback(dragDirs, swipeDirs){
+        var nameAdapter = adapter
+
+
+        override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+            nameAdapter!!.swapItems(viewHolder.absoluteAdapterPosition, target.absoluteAdapterPosition)
+            adaptador!!.notifyItemMoved(viewHolder.absoluteAdapterPosition, target.absoluteAdapterPosition)
+            adaptador!!.notifyItemRangeChanged(0, kotlin.math.max(viewHolder.absoluteAdapterPosition, target.absoluteAdapterPosition), Any())
+            return true
+        }
+
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+
+        }
     }
 
     //función para determinar el color
