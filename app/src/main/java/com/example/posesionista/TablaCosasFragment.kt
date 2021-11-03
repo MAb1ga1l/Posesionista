@@ -4,10 +4,9 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -30,6 +29,12 @@ class TablaCosasFragment : Fragment() {
         callbackinterfaz = context as InterfazTablaDeCosas?
     }
 
+    override fun onStart() {
+        super.onStart()
+        val barraActividad = activity as AppCompatActivity
+        barraActividad.supportActionBar?.setTitle(R.string.app_name)
+    }
+
     override fun onDetach() {
         super.onDetach()
         callbackinterfaz = null
@@ -48,6 +53,7 @@ class TablaCosasFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
         Log.d(TAG,"Total de cosas : ${tablaCosasViewModel.inventario.size}")
     }
 
@@ -119,5 +125,24 @@ class TablaCosasFragment : Fragment() {
             return inventario.size
         }
 
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.menu_tabla_de_cosas,menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId){
+            R.id.nueva_cosa -> {
+                //en caso de que se seleccione la opción del menu para agregar una nueva cosa
+                val nuevaCosa = Cosa()
+                //Se crea y se llena la cosa vacía
+                tablaCosasViewModel.agregaCosa(nuevaCosa)
+                callbackinterfaz?.onCosasSeleccionada(nuevaCosa)
+                true
+            }else -> return super.onOptionsItemSelected(item)
+        }
+        //return super.onOptionsItemSelected(item)
     }
 }

@@ -9,14 +9,17 @@ import java.util.*
 class Cosa():Parcelable {
     var nombreDeCosa: String = ""
     var valorPesos: Int = 0
-    var numSerie: String = UUID.randomUUID().toString().substring(0,6)
+    //var numSerie: String = UUID.randomUUID().toString().substring(0,6)
+    var numSerie: String = ""
     var fechaCreacion: Date = Date()
+    var idCosa = UUID.randomUUID().toString().substring(0,6)
 
     constructor(parcel: Parcel):this(){
         nombreDeCosa = parcel.readString().toString()
         valorPesos = parcel.readInt()
         numSerie = parcel.readString().toString()
         fechaCreacion = parcel.readSerializable() as Date
+        idCosa = parcel.readString().toString()
     }
 
     override fun describeContents(): Int {

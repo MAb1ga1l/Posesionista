@@ -3,5 +3,7 @@
     <string name="labelNombre">Nombre</string>
     <string name="labelPrecio">Precio</string>
     <string name="labelSerie">No. Serie</string>
-    <string name="lanelFecha">Fecha</string>
+    <string name="nuevaCosa">Añade Cosa</string>
+    <string name="labelFecha">dd - mm- aa</string>
+    <string name="detalleCosa">Detalle de cosa</string>
 </resources>
