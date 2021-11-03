@@ -2,6 +2,7 @@ package com.example.posesionista
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Color.argb
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -9,8 +10,10 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import java.util.*
 
 private const val TAG = "TablaCosasFragment"
 class TablaCosasFragment : Fragment() {
@@ -40,12 +43,47 @@ class TablaCosasFragment : Fragment() {
         callbackinterfaz = null
     }
 
-    private fun actualizaUI(){
+    private fun actualizaUI(context: Context){
         //Liga al inventario
         val inventario = tablaCosasViewModel.inventario
         adaptador = CosaAdapter(inventario)
+        val swipeGesture = object : SwipeGesture(context) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return false
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                when(direction){
+                    ItemTouchHelper.LEFT -> {
+                        val dialogoFragment = ConfirmaDialogoFragment{flag ->  showDialogFragment(flag,viewHolder)}
+                        dialogoFragment.show(childFragmentManager, dialogoFragment.tag)
+
+                    }
+                }
+            }
+        }
+
+
+
+        val touchHelper = ItemTouchHelper(swipeGesture)
+        touchHelper.attachToRecyclerView(cosaRecyclerView)
+
         cosaRecyclerView.adapter = adaptador
     }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun showDialogFragment(flag : Boolean, viewHolder : RecyclerView.ViewHolder) {
+        if(flag){
+            tablaCosasViewModel.eliminarCosa(viewHolder.absoluteAdapterPosition)
+        }
+        adaptador!!.notifyDataSetChanged()
+    }
+
+
 
     private val tablaCosasViewModel : TablaCosasViewModel by lazy {
         ViewModelProvider(this).get(TablaCosasViewModel::class.java)
@@ -58,9 +96,6 @@ class TablaCosasFragment : Fragment() {
     }
 
     companion object{
-        fun nuevaInstancia() : TablaCosasFragment{
-            return TablaCosasFragment()
-        }
     }
 
     override fun onCreateView(
@@ -73,7 +108,10 @@ class TablaCosasFragment : Fragment() {
         cosaRecyclerView = vista.findViewById(R.id.cosa_recycler_view) as RecyclerView
         //indicamos el layout manager (para definir como se acomodan las cosas)
         cosaRecyclerView.layoutManager = LinearLayoutManager(context)
-        actualizaUI()
+        actualizaUI(requireContext().applicationContext)
+        val dragManageAdapter = DragManageAdapter(adaptador,context,ItemTouchHelper.UP or ItemTouchHelper.DOWN,ItemTouchHelper.LEFT)
+        val helper = ItemTouchHelper(dragManageAdapter)
+        helper.attachToRecyclerView(cosaRecyclerView)
         return vista
     }
 
@@ -84,6 +122,7 @@ class TablaCosasFragment : Fragment() {
         //itemView es para buscar los elementos en la vista que se recibe
         val nombreTextView : TextView = itemView.findViewById(R.id.label_nombreCosa)
         val precioTextView : TextView = itemView.findViewById(R.id.label_precioCosa)
+        val numSerieTextView : TextView = itemView.findViewById(R.id.label_numSerie)
         private lateinit var cosa:Cosa
 
         @SuppressLint("SetTextI18n")
@@ -91,6 +130,7 @@ class TablaCosasFragment : Fragment() {
             this.cosa = cosa
             nombreTextView.text =cosa.nombreDeCosa
             precioTextView.text = "$" + cosa.valorPesos
+            numSerieTextView.text = cosa.numSerie
         }
 
         override fun onClick(v: View?) {
@@ -118,11 +158,44 @@ class TablaCosasFragment : Fragment() {
             //Vamos a poblar
             val cosa = inventario[position]
             holder.binding(cosa)
+            holder.itemView.setBackgroundColor(determinarColor(cosa.valorPesos))
         }
 
         //Cantidad de items en la lista
         override fun getItemCount(): Int {
             return inventario.size
+        }
+
+        //Ordenar arreglo de nuevo después del drag
+        fun swapItems(fromPosition: Int, toPosition: Int) {
+            val nombreDeCosaAyuda : String = inventario[fromPosition].nombreDeCosa
+            val valorEnPesosAyuda : Int = inventario[fromPosition].valorPesos
+            val fechaDeCreacionAyuda : Date = inventario[fromPosition].fechaCreacion//El toString() puede que no sirva
+            val numeroDeSerieAyuda : String = inventario[fromPosition].numSerie
+
+
+            if (fromPosition < toPosition) {
+                for (i in fromPosition until toPosition) {//Antes eb vez del until era ..
+                    inventario[i].nombreDeCosa = inventario[i+1].nombreDeCosa
+                    inventario[i].valorPesos = inventario[i+1].valorPesos
+                    inventario[i].numSerie = inventario[i+1].numSerie
+                    inventario[i].fechaCreacion = inventario[i+1].fechaCreacion
+                    //inventario.set(i, inventario.set(i+1, inventario.get(i)));
+                }
+            } else {
+                for (i in fromPosition..toPosition + 1) {
+                    inventario[i].nombreDeCosa = inventario[i-1].nombreDeCosa
+                    inventario[i].valorPesos = inventario[i-1].valorPesos
+                    inventario[i].numSerie = inventario[i-1].numSerie
+                    inventario[i].fechaCreacion = inventario[i-1].fechaCreacion
+                    //inventario.set(i, inventario.set(i-1, inventario.get(i)));
+                }
+            }
+
+            inventario[toPosition].nombreDeCosa = nombreDeCosaAyuda
+            inventario[toPosition].valorPesos = valorEnPesosAyuda
+            inventario[toPosition].fechaCreacion = fechaDeCreacionAyuda
+            inventario[toPosition].numSerie = numeroDeSerieAyuda
         }
 
     }
@@ -145,4 +218,49 @@ class TablaCosasFragment : Fragment() {
         }
         //return super.onOptionsItemSelected(item)
     }
+
+
+
+    @Suppress("UNUSED_PARAMETER")
+    private inner class DragManageAdapter(adapter: CosaAdapter?, context: Context?, dragDirs: Int, swipeDirs: Int) : ItemTouchHelper.SimpleCallback(dragDirs, swipeDirs){
+        var nameAdapter = adapter
+
+
+        override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+            nameAdapter!!.swapItems(viewHolder.absoluteAdapterPosition, target.absoluteAdapterPosition)
+            adaptador!!.notifyItemMoved(viewHolder.absoluteAdapterPosition, target.absoluteAdapterPosition)
+            adaptador!!.notifyItemRangeChanged(0, kotlin.math.max(viewHolder.absoluteAdapterPosition, target.absoluteAdapterPosition), Any())
+            return true
+        }
+
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+
+        }
+    }
+
+    //función para determinar el color
+    private fun determinarColor(valorPesos: Int): Int {
+        var min = 0
+        var max = 99
+        var r = 0
+        var a = 255
+        var flag = true
+        for (i in 0..10) {
+            if (flag) {
+                //verificar si esta en el rango min - max
+                if ( valorPesos <= max) {
+                    flag = false
+                } else {
+                    min += 100
+                    max += 100
+                    r += 25
+                    a -= 25
+                }
+            }
+        }
+        return argb(a,r, 0, 255)
+    }
+
+
+
 }
