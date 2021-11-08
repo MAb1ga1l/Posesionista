@@ -95,8 +95,7 @@ class TablaCosasFragment : Fragment() {
         Log.d(TAG,"Total de cosas : ${tablaCosasViewModel.inventario.size}")
     }
 
-    companion object{
-    }
+    companion object;
 
     override fun onCreateView(
         inflater: LayoutInflater,

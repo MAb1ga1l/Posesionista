@@ -3,13 +3,13 @@ package com.example.posesionista
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.text.Editable
+import android.text.TextUtils
 import android.text.TextWatcher
 import android.util.Log
 import android.text.format.DateFormat
@@ -71,7 +71,6 @@ class CosaFragment : Fragment() {
                         if (s.isEmpty()){
                             Toast.makeText(context, "Dejaste el nombre en blanco", Toast.LENGTH_SHORT).show()
                             cosa.nombreDeCosa = "Artículo sin nombrar"
-
                         }
                     }
                 }
@@ -208,6 +207,14 @@ class CosaFragment : Fragment() {
             return CosaFragment().apply {
                 arguments = argumentos
             }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if(TextUtils.isEmpty(campoNombre.text)){
+            Toast.makeText(context, "Dejaste el nombre en blanco", Toast.LENGTH_SHORT).show()
+            cosa.nombreDeCosa = "Artículo sin nombrar"
         }
     }
 }
