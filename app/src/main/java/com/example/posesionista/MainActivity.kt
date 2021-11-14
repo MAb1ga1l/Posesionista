@@ -14,14 +14,12 @@ class MainActivity : AppCompatActivity() , TablaCosasFragment.InterfazTablaDeCos
         //Debido a que puede existir cierta persistencia con las actividades es necesario asegurar si hay o no un fragmento
         if (fragmentoActtual == null){
             val fragmento = TablaCosasFragment()
-            //val fragmento = CosaFragment()
             supportFragmentManager.beginTransaction().add(R.id.fragment_container, fragmento).commit()
         }
     }
 
     override fun onCosasSeleccionada(unaCosa: Cosa) {
        Log.d(TAG, "MainActivity recibió la Cosa: ${unaCosa.nombreDeCosa} con UUID : ${unaCosa.numSerie}")
-        //val fragmento = CosaFragment()
         val fragmento = CosaFragment.nuevaInstancia(unaCosa)
         supportFragmentManager.beginTransaction().
         replace(R.id.fragment_container,fragmento)

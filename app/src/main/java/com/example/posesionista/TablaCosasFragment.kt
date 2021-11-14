@@ -78,7 +78,11 @@ class TablaCosasFragment : Fragment() {
     @SuppressLint("NotifyDataSetChanged")
     private fun showDialogFragment(flag : Boolean, viewHolder : RecyclerView.ViewHolder) {
         if(flag){
-            tablaCosasViewModel.eliminarCosa(viewHolder.absoluteAdapterPosition)
+            context?.let {
+                tablaCosasViewModel.eliminarCosa(viewHolder.absoluteAdapterPosition,
+                    it
+                )
+            }
         }
         adaptador!!.notifyDataSetChanged()
     }
@@ -169,7 +173,7 @@ class TablaCosasFragment : Fragment() {
         fun swapItems(fromPosition: Int, toPosition: Int) {
             val nombreDeCosaAyuda : String = inventario[fromPosition].nombreDeCosa
             val valorEnPesosAyuda : Int = inventario[fromPosition].valorPesos
-            val fechaDeCreacionAyuda : Date = inventario[fromPosition].fechaCreacion//El toString() puede que no sirva
+            val fechaDeCreacionAyuda : Date = inventario[fromPosition].fechaCreacion
             val numeroDeSerieAyuda : String = inventario[fromPosition].numSerie
 
 

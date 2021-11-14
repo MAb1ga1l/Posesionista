@@ -6,8 +6,8 @@
     <string name="nuevaCosa">Añade Cosa</string>
     <string name="labelFecha">dd - mm- aa</string>
     <string name="detalleCosa">Detalle de cosa</string>
-    <string name="todo">TODO</string>
     <string name="cancel">Cancelar</string>
     <string name="Ok">¿Seguro que quires eliminar este artículo?</string>
     <string name="fire">OK</string>
+    <string name="todo">TODO</string>
 </resources>

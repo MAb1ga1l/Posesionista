@@ -41,13 +41,17 @@ class CosaFragment : Fragment() {
     private lateinit var vistaFoto : ImageView
     private lateinit var botonCamara : ImageButton
     private lateinit var archivoFoto : File
+    private lateinit var botonEliminarFoto : ImageButton
+
+    @SuppressLint("UseCompatLoadingForDrawables")
     private var respuestaCamara = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
         //Se manda el activity result para poder ecibir el resultado
         resultado ->
         if (resultado.resultCode == Activity.RESULT_OK){
-            val datos = resultado.data
             vistaFoto.setImageBitmap(BitmapFactory.decodeFile(archivoFoto.absolutePath))
-            //vistaFoto.setImageBitmap(datos?.extras?.get("data") as Bitmap)
+            vistaFoto.background = resources.getDrawable(R.color.black)
+            botonEliminarFoto.isEnabled = true
+            botonEliminarFoto.isClickable = true
         }
     }
     private lateinit var botonCalendario : ImageButton
@@ -123,6 +127,7 @@ class CosaFragment : Fragment() {
         return File(pathFoto,file)
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -138,9 +143,19 @@ class CosaFragment : Fragment() {
         campoPrecio.setText(cosa.valorPesos.toString())
         campoSerie.setText(cosa.numSerie)
         vistaFoto = vista.findViewById(R.id.fotoCosa)
+        botonEliminarFoto = vista.findViewById(R.id.deleteImage)
+        botonEliminarFoto.setOnClickListener { eliminarFotoCosa() }
         botonCamara = vista.findViewById(R.id.botonCamara)
         archivoFoto = File(context?.getExternalFilesDir(Environment.DIRECTORY_PICTURES),"${cosa.idCosa}.jpg")
-        vistaFoto.setImageBitmap(BitmapFactory.decodeFile(archivoFoto.absolutePath))
+        if(archivoFoto.exists()) {
+            vistaFoto.background = resources.getDrawable(R.color.black)
+            botonEliminarFoto.isEnabled = true
+            botonEliminarFoto.isClickable = true
+            vistaFoto.setImageBitmap(BitmapFactory.decodeFile(archivoFoto.absolutePath))
+        }else{
+            botonEliminarFoto.isEnabled = false
+            botonEliminarFoto.isClickable = false
+        }
         campoSerie.setText(cosa.numSerie)
         campoFecha.text = ajusteFecha(cosa.fechaCreacion)
         botonCalendario = vista.findViewById(R.id.botonCalendario) as ImageButton
@@ -166,6 +181,17 @@ class CosaFragment : Fragment() {
             campoFecha.text = dia.toString().plus(" / ").plus(mesDelAnio).plus(" / ").plus(anio)
             val format = SimpleDateFormat("yyyy-MM-dd")
             cosa.fechaCreacion = format.parse(fecha)!!
+        }
+    }
+
+    @SuppressLint("UseCompatLoadingForDrawables")
+    fun eliminarFotoCosa() {
+        if(archivoFoto.exists()) {
+            archivoFoto.delete()
+            vistaFoto.background = resources.getDrawable(R.drawable.imagen_fondo)
+            vistaFoto.setImageDrawable(null)
+            botonEliminarFoto.isEnabled = false
+            botonEliminarFoto.isClickable = false
         }
     }
 
